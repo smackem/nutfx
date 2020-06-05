@@ -13,11 +13,11 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        var javaVersion = SystemInfo.javaVersion();
-        var javafxVersion = SystemInfo.javafxVersion();
+        final var javaVersion = SystemInfo.javaVersion();
+        final var javafxVersion = SystemInfo.javafxVersion();
 
-        var label = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
-        var scene = new Scene(new StackPane(label), 640, 480);
+        final var label = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
+        final var scene = new Scene(new StackPane(label), 640, 480);
         stage.setScene(scene);
         stage.show();
     }
@@ -25,5 +25,4 @@ public class App extends Application {
     public static void main(String[] args) {
         launch();
     }
-
 }
