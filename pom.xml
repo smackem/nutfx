@@ -10,6 +10,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>14</maven.compiler.release>
         <javafx.version>14</javafx.version>
+        <antlr.version>4.7.2</antlr.version>
     </properties>
 
     <modules>
@@ -53,7 +54,7 @@
             <dependency>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-runtime</artifactId>
-                <version>4.7.2</version>
+                <version>${antlr.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -103,7 +104,7 @@
                 <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.7.2</version>
+                    <version>${antlr.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
