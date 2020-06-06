@@ -3,8 +3,17 @@ package net.smackem.nutfx.core;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommandContext {
+public final class CommandContext {
     private final Map<String, Object> arguments = new HashMap<>();
+    private final Command command;
+
+    CommandContext(Command command) {
+        this.command = command;
+    }
+
+    Command command() {
+        return this.command;
+    }
 
     void put(String name, Object value) {
         this.arguments.put(name, value);
