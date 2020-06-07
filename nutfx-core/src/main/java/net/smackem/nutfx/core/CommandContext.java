@@ -2,6 +2,7 @@ package net.smackem.nutfx.core;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class CommandContext {
     private final Map<String, Object> arguments = new HashMap<>();
@@ -29,6 +30,10 @@ public final class CommandContext {
 
     public double getFloatingPoint(String name) {
         return (Double) this.arguments.get(name);
+    }
+
+    public boolean getBoolean(String name) {
+        return Objects.equals(this.arguments.get(name), Boolean.TRUE);
     }
 
     public <T> T get(String name) {

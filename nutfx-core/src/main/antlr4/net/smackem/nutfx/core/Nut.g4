@@ -14,7 +14,8 @@ namedParameter
 
 value
     : String
-    | Number
+    | Integer
+    | Float
     | Ident
     ;
 
@@ -22,8 +23,12 @@ Ident
     : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '_' | '-' | '0' .. '9') *
     ;
 
-Number
-    : [0-9]+ ('.' [0-9]+)?
+Integer
+    : [0-9]+
+    ;
+
+Float
+    : [0-9]+ '.' [0-9]+?
     ;
 
 String

@@ -56,7 +56,7 @@ public class Command {
         return this.shortcut;
     }
 
-    public Collection<Parameter<?>> parameters() {
+    public List<Parameter<?>> parameters() {
         return this.parameters;
     }
 
