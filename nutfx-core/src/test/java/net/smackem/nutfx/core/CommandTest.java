@@ -10,11 +10,12 @@ public class CommandTest {
                 .with(Parameter.string("color", "#ffffff"))
                 .with(Parameter.floatingPoint("x"))
                 .with(Parameter.floatingPoint("y"))
-                .with(Parameter.<Command>of("gurke"))
+                .with(Parameter.of("customInt", Integer::parseInt))
                 .handle(ctx -> {
-                    final var name = ctx.getString("name");
-                    final var x = ctx.getFloatingPoint("x");
-                    System.out.printf("%s: %f", name, x);
+                    final String name = ctx.getString("name");
+                    final double x = ctx.getFloatingPoint("x");
+                    final Integer n = ctx.get("customInt");
+                    System.out.printf("%s: %f, %d", name, x, n);
                 })
                 .build();
     }

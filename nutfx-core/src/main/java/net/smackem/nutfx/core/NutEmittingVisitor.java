@@ -62,7 +62,7 @@ public class NutEmittingVisitor extends NutBaseVisitor<Void> {
             case INTEGER -> Integer.parseInt(ctx.Integer().getText());
             case DOUBLE -> Double.parseDouble(ctx.Float().getText());
             case BOOLEAN -> Boolean.TRUE;
-            case CUSTOM -> null;
+            case CUSTOM -> parameter.converter().apply(ctx.getText());
         };
     }
 

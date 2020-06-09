@@ -16,13 +16,15 @@ public class CommandParserTest {
                 .with(Parameter.integer("paramInt"))
                 .with(Parameter.floatingPoint("paramFloat"))
                 .with(Parameter.bool("paramBool"))
+                .with(Parameter.of("custom", Integer::parseInt))
                 .handle(ctx -> {})
                 .build()));
-        final CommandContext ctx = parser.parse("test 'paramStrVal' 123 44.5 -paramBool");
+        final CommandContext ctx = parser.parse("test 'paramStrVal' 123 44.5 -paramBool -custom=55");
         assertThat(ctx.command().name()).isEqualTo("test");
         assertThat(ctx.getString("paramStr")).isEqualTo("paramStrVal");
         assertThat(ctx.getInteger("paramInt")).isEqualTo(123);
         assertThat(ctx.getFloatingPoint("paramFloat")).isEqualTo(44.5);
         assertThat(ctx.getBoolean("paramBool")).isTrue();
+        assertThat(ctx.<Integer>get("custom")).isEqualTo(55);
     }
 }

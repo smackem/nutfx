@@ -1,18 +1,21 @@
 package net.smackem.nutfx.core;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public class Parameter<T> {
     private final String name;
     private final ParameterType type;
     private final T defaultValue;
     private final boolean optional;
+    private final Function<String, T> converter;
 
-    private Parameter(String name, ParameterType type, T defaultValue, boolean optional) {
+    private Parameter(String name, ParameterType type, T defaultValue, boolean optional, Function<String, T> converter) {
         this.name = Objects.requireNonNull(name);
         this.type = Objects.requireNonNull(type);
         this.defaultValue = defaultValue;
         this.optional = optional;
+        this.converter = converter;
     }
 
     public String name() {
@@ -31,44 +34,50 @@ public class Parameter<T> {
         return this.defaultValue;
     }
 
+    public Function<String, T> converter() {
+        return this.converter;
+    }
+
     public static Parameter<String> string(String name) {
-        return new Parameter<>(name, ParameterType.STRING, null, false);
+        return new Parameter<>(name, ParameterType.STRING, null, false, null);
     }
 
     public static Parameter<String> string(String name, String defaultValue) {
-        return new Parameter<>(name, ParameterType.INTEGER, defaultValue, true);
+        return new Parameter<>(name, ParameterType.INTEGER, defaultValue, true, null);
     }
 
     public static Parameter<Integer> integer(String name) {
-        return new Parameter<>(name, ParameterType.INTEGER, null, false);
+        return new Parameter<>(name, ParameterType.INTEGER, null, false, null);
     }
 
     public static Parameter<Integer> integer(String name, int defaultValue) {
-        return new Parameter<>(name, ParameterType.INTEGER, defaultValue, true);
+        return new Parameter<>(name, ParameterType.INTEGER, defaultValue, true, null);
     }
 
     public static Parameter<Boolean> bool(String name) {
-        return new Parameter<>(name, ParameterType.BOOLEAN, null, false);
+        return new Parameter<>(name, ParameterType.BOOLEAN, null, false, null);
     }
 
     public static Parameter<Boolean> bool(String name, boolean defaultValue) {
-        return new Parameter<>(name, ParameterType.BOOLEAN, defaultValue, true);
+        return new Parameter<>(name, ParameterType.BOOLEAN, defaultValue, true, null);
     }
 
     public static Parameter<Double> floatingPoint(String name) {
-        return new Parameter<>(name, ParameterType.DOUBLE, null, false);
+        return new Parameter<>(name, ParameterType.DOUBLE, null, false, null);
     }
 
     public static Parameter<Double> floatingPoint(String name, double defaultValue) {
-        return new Parameter<>(name, ParameterType.DOUBLE, defaultValue, true);
+        return new Parameter<>(name, ParameterType.DOUBLE, defaultValue, true, null);
     }
 
-    public static <T> Parameter<T> of(String name) {
-        return new Parameter<>(name, ParameterType.CUSTOM, null, false);
+    public static <T> Parameter<T> of(String name, Function<String, T> converter) {
+        Objects.requireNonNull(converter);
+        return new Parameter<>(name, ParameterType.CUSTOM, null, false, converter);
     }
 
-    public static <T> Parameter<T> of(String name, T defaultValue) {
-        return new Parameter<>(name, ParameterType.CUSTOM, defaultValue, true);
+    public static <T> Parameter<T> of(String name, Function<String, T> converter, T defaultValue) {
+        Objects.requireNonNull(converter);
+        return new Parameter<>(name, ParameterType.CUSTOM, defaultValue, true, converter);
     }
 
     @Override
