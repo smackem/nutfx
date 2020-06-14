@@ -6,57 +6,57 @@ import java.util.Map;
 import java.util.Objects;
 
 public class NutEmittingVisitor extends NutBaseVisitor<Void> {
-    private final Map<String, Command> availableCommands;
-    private CommandContext commandContext;
+    private final Map<String, NutProc> availableCommands;
+    private NutInvocation invocation;
     private int positionalParameterIndex;
 
-    public NutEmittingVisitor(Map<String, Command> availableCommands) {
+    public NutEmittingVisitor(Map<String, NutProc> availableCommands) {
         this.availableCommands = Objects.requireNonNull(availableCommands);
     }
 
-    public CommandContext commandContext() {
-        return this.commandContext;
+    public NutInvocation invocation() {
+        return this.invocation;
     }
 
     @Override
     public Void visitCommand(NutParser.CommandContext ctx) {
         final String ident = ctx.Ident().getText();
-        final Command recognizedCommand = this.availableCommands.get(ident);
-        if (recognizedCommand == null) {
+        final NutProc recognizedNutProc = this.availableCommands.get(ident);
+        if (recognizedNutProc == null) {
             logError(ctx, String.format("unrecognized command: %s", ident));
         }
-        this.commandContext = new CommandContext(recognizedCommand);
+        this.invocation = new NutInvocation(recognizedNutProc);
         return super.visitCommand(ctx);
     }
 
     @Override
     public Void visitPositionalParameter(NutParser.PositionalParameterContext ctx) {
-        final var parameters = this.commandContext.command().parameters();
+        final var parameters = this.invocation.proc().parameters();
         if (this.positionalParameterIndex >= parameters.size()) {
             logError(ctx, "too many positional parameters");
         } else {
             final var parameter = parameters.get(this.positionalParameterIndex);
             this.positionalParameterIndex++;
-            this.commandContext.put(parameter.name(), parseValue(ctx.value(), parameter));
+            this.invocation.put(parameter.name(), parseValue(ctx.value(), parameter));
         }
         return super.visitPositionalParameter(ctx);
     }
 
     @Override
     public Void visitNamedParameter(NutParser.NamedParameterContext ctx) {
-        final var parameter = this.commandContext.command().parameters().stream()
+        final var parameter = this.invocation.proc().parameters().stream()
                 .filter(p -> Objects.equals(p.name(), ctx.Ident().getText()))
                 .findFirst()
                 .orElse(null);
         if (parameter == null) {
             logError(ctx, "unknown parameter: " + ctx.Ident().getText());
         } else {
-            this.commandContext.put(parameter.name(), parseValue(ctx.value(), parameter));
+            this.invocation.put(parameter.name(), parseValue(ctx.value(), parameter));
         }
         return super.visitNamedParameter(ctx);
     }
 
-    private Object parseValue(NutParser.ValueContext ctx, Parameter<?> parameter) {
+    private Object parseValue(NutParser.ValueContext ctx, NutProcParameter<?> parameter) {
         return switch (parameter.type()) {
             case STRING -> ctx.String().getText().replaceAll("[\"']", "");
             case INTEGER -> Integer.parseInt(ctx.Integer().getText());

@@ -4,39 +4,43 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public final class CommandContext {
+public final class NutInvocation {
     private final Map<String, Object> arguments = new HashMap<>();
-    private final Command command;
+    private final NutProc proc;
 
-    CommandContext(Command command) {
-        this.command = command;
+    NutInvocation(NutProc proc) {
+        this.proc = proc;
     }
 
-    Command command() {
-        return this.command;
+    NutProc proc() {
+        return this.proc;
+    }
+
+    public void invoke() {
+        final Object[] args = new Object[this.proc.parameters().size()];
     }
 
     void put(String name, Object value) {
         this.arguments.put(name, value);
     }
 
-    public String getString(String name) {
+    String getString(String name) {
         return (String) this.arguments.get(name);
     }
 
-    public int getInteger(String name) {
+    int getInteger(String name) {
         return (Integer) this.arguments.get(name);
     }
 
-    public double getFloatingPoint(String name) {
+    double getFloatingPoint(String name) {
         return (Double) this.arguments.get(name);
     }
 
-    public boolean getBoolean(String name) {
+    boolean getBoolean(String name) {
         return Objects.equals(this.arguments.get(name), Boolean.TRUE);
     }
 
-    public <T> T get(String name) {
+    <T> T get(String name) {
         //noinspection unchecked
         return (T) this.arguments.get(name);
     }

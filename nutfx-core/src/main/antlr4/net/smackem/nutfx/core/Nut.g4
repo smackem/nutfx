@@ -1,6 +1,6 @@
 grammar Nut;
 
-command
+nutProc
     : Ident positionalParameter* namedParameter* EOF
     ;
 
