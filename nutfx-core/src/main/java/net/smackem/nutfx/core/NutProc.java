@@ -42,32 +42,24 @@ class NutProc {
     }
 
     private static NutProcParameter<?> convertParameter(Parameter parameter) {
+        final var nutParam = parameter.getDeclaredAnnotation(NutParam.class);
+        if (nutParam == null) {
+            throw new IllegalArgumentException("parameter '" + parameter.getName() + "' is not annotated with NutParam");
+        }
         final Class<?> type = parameter.getType();
-        if (type == int.class) {
-            return NutProcParameter.integer(parameter.getName(), false);
+        final boolean optional = type.isPrimitive() == false && nutParam.isRequired() == false;
+        if (type == int.class || type == Integer.class) {
+            return NutProcParameter.integer(nutParam.value(), optional);
         }
-        if (type == boolean.class) {
-            return NutProcParameter.bool(parameter.getName(), false);
+        if (type == boolean.class || type == Boolean.class) {
+            return NutProcParameter.bool(nutParam.value(), optional);
         }
-        if (type == double.class) {
-            return NutProcParameter.floatingPoint(parameter.getName(), false);
+        if (type == double.class || type == Double.class) {
+            return NutProcParameter.floatingPoint(nutParam.value(), optional);
         }
         if (type == String.class) {
-            return NutProcParameter.string(parameter.getName(), isRequired(parameter) == false);
-        }
-        if (type == Integer.class) {
-            return NutProcParameter.integer(parameter.getName(), isRequired(parameter) == false);
-        }
-        if (type == Boolean.class) {
-            return NutProcParameter.bool(parameter.getName(), isRequired(parameter) == false);
-        }
-        if (type == Double.class) {
-            return NutProcParameter.floatingPoint(parameter.getName(), isRequired(parameter) == false);
+            return NutProcParameter.string(nutParam.value(), optional);
         }
         throw new IllegalArgumentException("parameter '" + parameter.getName() + "' is of unsupported type");
-    }
-
-    private static boolean isRequired(Parameter parameter) {
-        return parameter.getDeclaredAnnotation(NutRequired.class) != null;
     }
 }
