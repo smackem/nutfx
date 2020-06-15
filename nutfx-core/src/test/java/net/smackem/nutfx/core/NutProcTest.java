@@ -46,6 +46,9 @@ public class NutProcTest {
         assertThat(proc.parameters())
                 .extracting(NutProcParameter::type)
                 .containsExactly(ParameterType.INTEGER, ParameterType.BOOLEAN, ParameterType.DOUBLE);
+        assertThat(proc.parameters())
+                .extracting(NutProcParameter::isOptional)
+                .containsExactly(false, false, false);
     }
 
     @NutMethod
@@ -54,6 +57,27 @@ public class NutProcTest {
             // primitive parameters are ALWAYS required, regardless of the annotation setting
             @NutParam(value = "b", isRequired = false) boolean b,
             @NutParam("d") double d) {
+    }
+
+    @Test
+    public void testOptionalParameters() {
+        final var method = getMethodByName("methodWithOptionalParameters");
+        final var proc = NutProc.fromMethod(method);
+        assertThat(proc.parameters())
+                .extracting(NutProcParameter::name)
+                .containsExactly("n", "b", "d", "s", "required");
+        assertThat(proc.parameters())
+                .extracting(NutProcParameter::isOptional)
+                .containsExactly(true, true, true, true, false);
+    }
+
+    @NutMethod
+    void methodWithOptionalParameters(
+            @NutParam("n") Integer n,
+            @NutParam("b") Boolean b,
+            @NutParam("d") Double d,
+            @NutParam("s") String s,
+            @NutParam(value = "required", isRequired = true) String required) {
     }
 
     private Method getMethodByName(String name) {

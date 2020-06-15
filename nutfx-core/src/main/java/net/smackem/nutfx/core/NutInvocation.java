@@ -1,5 +1,6 @@
 package net.smackem.nutfx.core;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,32 +17,27 @@ public final class NutInvocation {
         return this.proc;
     }
 
-    public void invoke() {
+    public void invoke(Object controller) throws InvocationTargetException, IllegalAccessException {
+        Objects.requireNonNull(controller);
         final Object[] args = new Object[this.proc.parameters().size()];
+        int index = 0;
+        for (final var parameter : this.proc.parameters()) {
+            final Object arg = this.arguments.get(parameter.name());
+            if (arg == null && parameter.isOptional() == false) {
+                throw new InvocationTargetException(
+                        new UnsupportedOperationException("NutMethod '%s': NutParam '%s' is required but has value null"
+                                .formatted(this.proc.name(), parameter.name())));
+            }
+            args[index++] = arg;
+        }
+        this.proc.method().invoke(controller, args);
     }
 
     void put(String name, Object value) {
         this.arguments.put(name, value);
     }
 
-    String getString(String name) {
-        return (String) this.arguments.get(name);
-    }
-
-    int getInteger(String name) {
-        return (Integer) this.arguments.get(name);
-    }
-
-    double getFloatingPoint(String name) {
-        return (Double) this.arguments.get(name);
-    }
-
-    boolean getBoolean(String name) {
-        return Objects.equals(this.arguments.get(name), Boolean.TRUE);
-    }
-
-    <T> T get(String name) {
-        //noinspection unchecked
-        return (T) this.arguments.get(name);
+    Object get(String name) {
+        return this.arguments.get(name);
     }
 }
