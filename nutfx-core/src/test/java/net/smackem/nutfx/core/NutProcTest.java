@@ -13,7 +13,7 @@ public class NutProcTest {
 
     @Test
     public void testNoParameters() {
-        final var method = getMethodByName("methodWithoutParameters");
+        final var method = NutTests.getMethodByName(this, "methodWithoutParameters");
         final var proc = NutProc.fromMethod(method);
         assertThat(proc.name()).isEqualTo(method.getName());
         assertThat(proc.parameters()).isEmpty();
@@ -26,7 +26,7 @@ public class NutProcTest {
 
     @Test
     public void testIllegalReturnType() {
-        final var method = getMethodByName("methodReturningInt");
+        final var method = NutTests.getMethodByName(this, "methodReturningInt");
         assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -37,7 +37,7 @@ public class NutProcTest {
 
     @Test
     public void testBasicParameters() {
-        final var method = getMethodByName("methodWithBasicParameters");
+        final var method = NutTests.getMethodByName(this, "methodWithBasicParameters");
         final var proc = NutProc.fromMethod(method);
         assertThat(proc.parameters()).hasSize(3);
         assertThat(proc.parameters())
@@ -61,7 +61,7 @@ public class NutProcTest {
 
     @Test
     public void testOptionalParameters() {
-        final var method = getMethodByName("methodWithOptionalParameters");
+        final var method = NutTests.getMethodByName(this, "methodWithOptionalParameters");
         final var proc = NutProc.fromMethod(method);
         assertThat(proc.parameters())
                 .extracting(NutProcParameter::name)
@@ -78,12 +78,5 @@ public class NutProcTest {
             @NutParam("d") Double d,
             @NutParam("s") String s,
             @NutParam(value = "required", isRequired = true) String required) {
-    }
-
-    private Method getMethodByName(String name) {
-        return Arrays.stream(getClass().getDeclaredMethods())
-                .filter(m -> Objects.equals(m.getName(), name))
-                .findFirst()
-                .orElseThrow();
     }
 }
