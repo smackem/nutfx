@@ -1,5 +1,7 @@
 package net.smackem.nutfx.core;
 
+import net.smackem.nutfx.lang.NutBaseVisitor;
+import net.smackem.nutfx.lang.NutParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Map;
@@ -19,14 +21,14 @@ public class NutEmittingVisitor extends NutBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitCommand(NutParser.CommandContext ctx) {
+    public Void visitNutProc(NutParser.NutProcContext ctx) {
         final String ident = ctx.Ident().getText();
         final NutProc recognizedNutProc = this.availableCommands.get(ident);
         if (recognizedNutProc == null) {
             logError(ctx, String.format("unrecognized command: %s", ident));
         }
         this.invocation = new NutInvocation(recognizedNutProc);
-        return super.visitCommand(ctx);
+        return super.visitNutProc(ctx);
     }
 
     @Override

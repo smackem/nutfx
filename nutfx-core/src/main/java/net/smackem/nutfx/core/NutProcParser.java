@@ -1,5 +1,7 @@
 package net.smackem.nutfx.core;
 
+import net.smackem.nutfx.lang.NutLexer;
+import net.smackem.nutfx.lang.NutParser;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.CharStreams;
 
@@ -25,7 +27,7 @@ public class NutProcParser {
         final var tokens = new BufferedTokenStream(lexer);
         final var parser = new NutParser(tokens);
         final var emitter = new NutEmittingVisitor(this.procMap);
-        emitter.visitCommand(parser.command());
+        emitter.visitNutProc(parser.nutProc());
         return emitter.invocation();
     }
 }

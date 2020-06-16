@@ -2,10 +2,6 @@ package net.smackem.nutfx.core;
 
 import org.junit.Test;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -78,5 +74,17 @@ public class NutProcTest {
             @NutParam("d") Double d,
             @NutParam("s") String s,
             @NutParam(value = "required", isRequired = true) String required) {
+    }
+
+    @Test
+    public void throwsOnMissingParameterAnnotation() {
+        final var method = NutTests.getMethodByName(this, "methodWithMissingParameterAnnotation");
+        assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @NutMethod
+    void methodWithMissingParameterAnnotation(
+            @NutParam("n") Integer n,
+            String required) {
     }
 }

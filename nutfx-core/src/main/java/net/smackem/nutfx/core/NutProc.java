@@ -20,7 +20,14 @@ class NutProc {
         if (method.getReturnType() != void.class) {
             throw new IllegalArgumentException("controller method '" + method.getName() + "' does not return void");
         }
-        return new NutProc(method.getName(), convertParameters(method.getParameters()), method);
+        final var nutMethod = method.getDeclaredAnnotation(NutMethod.class);
+        if (nutMethod == null) {
+            throw new IllegalArgumentException("controller method '" + method.getName() + "' is not annotated with @NutMethod");
+        }
+        final var name = nutMethod.value().isBlank()
+                ? method.getName()
+                : nutMethod.value();
+        return new NutProc(name, convertParameters(method.getParameters()), method);
     }
 
     public String name() {

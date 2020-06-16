@@ -2,28 +2,79 @@ package net.smackem.nutfx.core;
 
 import org.junit.Test;
 
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class NutProcParserTest {
 
     @Test
-    public void parse() {
-//        final NutProcParser parser = new NutProcParser(List.of(new NutProc.Builder("test")
-//                .with(NutProcParameter.string("paramStr"))
-//                .with(NutProcParameter.integer("paramInt"))
-//                .with(NutProcParameter.floatingPoint("paramFloat"))
-//                .with(NutProcParameter.bool("paramBool"))
-//                .with(NutProcParameter.of("custom", Integer::parseInt))
-//                .handle(ctx -> {})
-//                .build()));
-//        final NutInvocation ctx = parser.parse("test 'paramStrVal' 123 44.5 -paramBool -custom=55");
-//        assertThat(ctx.command().name()).isEqualTo("test");
-//        assertThat(ctx.getString("paramStr")).isEqualTo("paramStrVal");
-//        assertThat(ctx.getInteger("paramInt")).isEqualTo(123);
-//        assertThat(ctx.getFloatingPoint("paramFloat")).isEqualTo(44.5);
-//        assertThat(ctx.getBoolean("paramBool")).isTrue();
-//        assertThat(ctx.<Integer>get("custom")).isEqualTo(55);
+    public void takesNameFromAnnotation() throws InvocationTargetException, IllegalAccessException {
+        final Controller controller = new Controller();
+        final NutProcParser parser = new NutProcParser(controller);
+        final String source = """
+                test-it
+                """;
+        final var invocation = parser.parse(source);
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("done");
+    }
+
+    @Test
+    public void parseMethodWithoutParams() throws InvocationTargetException, IllegalAccessException {
+        final Controller controller = new Controller();
+        final NutProcParser parser = new NutProcParser(controller);
+        final String source = """
+                test
+                """;
+        final var invocation = parser.parse(source);
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("done");
+    }
+
+    @Test
+    public void parseMethodWithParams() throws InvocationTargetException, IllegalAccessException {
+        final Controller controller = new Controller();
+        final NutProcParser parser = new NutProcParser(controller);
+        final String source = """
+                test-params 123 'hello' -b
+                """;
+        final var invocation = parser.parse(source);
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("123 hello true");
+    }
+
+    @Test
+    public void throwsOnDuplicateMethodNames() {
+        final var controller = new ControllerWithDuplicates();
+        assertThatThrownBy(() -> new NutProcParser(controller)).isInstanceOf(IllegalStateException.class);
+    }
+
+    static class Controller {
+        String string;
+
+        @NutMethod()
+        void test() {
+            this.string = "done";
+        }
+
+        @NutMethod("test-it")
+        void testIt() {
+            this.string = "done";
+        }
+
+        @NutMethod("test-params")
+        void voidTestParams(@NutParam("n") int n, @NutParam("n") String s, @NutParam("n") boolean b) {
+            this.string = "%d %s %b".formatted(n, s, b);
+        }
+    }
+
+    static class ControllerWithDuplicates {
+        @NutMethod()
+        void a() { }
+
+        @NutMethod("a")
+        void b() { }
     }
 }
