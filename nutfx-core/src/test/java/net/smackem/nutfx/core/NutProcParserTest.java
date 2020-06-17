@@ -65,7 +65,7 @@ public class NutProcParserTest {
         }
 
         @NutMethod("test-params")
-        void voidTestParams(@NutParam("n") int n, @NutParam("n") String s, @NutParam("n") boolean b) {
+        void voidTestParams(@NutParam("n") int n, @NutParam("s") String s, @NutParam("b") boolean b) {
             this.string = "%d %s %b".formatted(n, s, b);
         }
     }

@@ -87,4 +87,14 @@ public class NutProcTest {
             @NutParam("n") Integer n,
             String required) {
     }
+
+    @Test
+    public void throwsOnNonUniqueParameterName() {
+        final var method = NutTests.getMethodByName(this, "methodWithNonUniqueParameterNames");
+        assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @NutMethod
+    void methodWithNonUniqueParameterNames(@NutParam("x") int x, @NutParam("x") int y) {
+    }
 }

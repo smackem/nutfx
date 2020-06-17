@@ -27,7 +27,9 @@ class NutProc {
         final var name = nutMethod.value().isBlank()
                 ? method.getName()
                 : nutMethod.value();
-        return new NutProc(name, convertParameters(method.getParameters()), method);
+        final var parameters = convertParameters(method.getParameters());
+        assertParametersUnique(parameters, name);
+        return new NutProc(name, parameters, method);
     }
 
     public String name() {
@@ -46,6 +48,15 @@ class NutProc {
         return Arrays.stream(parameters)
                 .map(NutProc::convertParameter)
                 .collect(Collectors.toList());
+    }
+
+    private static void assertParametersUnique(Collection<NutProcParameter<?>> parameters, String methodName) {
+        final Set<String> parameterNames = new HashSet<>();
+        for (final var parameter : parameters) {
+            if (parameterNames.add(parameter.name()) == false) {
+                throw new IllegalArgumentException("method '" + methodName + "': + parameter name '" + parameter.name() + "' is not unique");
+            }
+        }
     }
 
     private static NutProcParameter<?> convertParameter(Parameter parameter) {

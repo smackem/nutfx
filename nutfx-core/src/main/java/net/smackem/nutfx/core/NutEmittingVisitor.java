@@ -41,7 +41,7 @@ public class NutEmittingVisitor extends NutBaseVisitor<Void> {
             this.positionalParameterIndex++;
             this.invocation.put(parameter.name(), parseValue(ctx.value(), parameter));
         }
-        return super.visitPositionalParameter(ctx);
+        return null;//super.visitPositionalParameter(ctx);
     }
 
     @Override
