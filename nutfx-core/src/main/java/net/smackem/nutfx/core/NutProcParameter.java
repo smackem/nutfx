@@ -33,7 +33,7 @@ class NutProcParameter<T> {
     }
 
     public static NutProcParameter<String> string(String name, boolean optional) {
-        return new NutProcParameter<>(name, ParameterType.INTEGER, optional, null);
+        return new NutProcParameter<>(name, ParameterType.STRING, optional, null);
     }
 
     public static NutProcParameter<Integer> integer(String name, boolean optional) {

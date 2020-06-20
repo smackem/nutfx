@@ -65,6 +65,10 @@ public class NutProcTest {
         assertThat(proc.parameters())
                 .extracting(NutProcParameter::isOptional)
                 .containsExactly(true, true, true, true, false);
+        assertThat(proc.parameters())
+                .extracting(NutProcParameter::type)
+                .containsExactly(ParameterType.INTEGER, ParameterType.BOOLEAN, ParameterType.DOUBLE,
+                        ParameterType.STRING, ParameterType.STRING);
     }
 
     @NutMethod

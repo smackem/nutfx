@@ -11,6 +11,9 @@ public final class NutInvocation {
 
     NutInvocation(NutProc proc) {
         this.proc = proc;
+        this.proc.parameters().stream()
+                .filter(p -> p.type() == ParameterType.BOOLEAN && p.isOptional() == false)
+                .forEach(p -> put(p.name(), false));
     }
 
     NutProc proc() {

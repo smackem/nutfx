@@ -41,7 +41,7 @@ public class NutEmittingVisitor extends NutBaseVisitor<Void> {
             this.positionalParameterIndex++;
             this.invocation.put(parameter.name(), parseValue(ctx.value(), parameter));
         }
-        return null;//super.visitPositionalParameter(ctx);
+        return super.visitPositionalParameter(ctx);
     }
 
     @Override
@@ -60,10 +60,10 @@ public class NutEmittingVisitor extends NutBaseVisitor<Void> {
 
     private Object parseValue(NutParser.ValueContext ctx, NutProcParameter<?> parameter) {
         return switch (parameter.type()) {
-            case STRING -> ctx.String().getText().replaceAll("[\"']", "");
+            case STRING -> ctx.getText().replaceAll("^[\"']|[\"']$", "");
             case INTEGER -> Integer.parseInt(ctx.Integer().getText());
             case DOUBLE -> Double.parseDouble(ctx.Float().getText());
-            case BOOLEAN -> Boolean.TRUE;
+            case BOOLEAN -> ctx == null || ctx.getText().isBlank() || Boolean.parseBoolean(ctx.getText());
             case CUSTOM -> parameter.converter().apply(ctx.getText());
         };
     }
