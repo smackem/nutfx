@@ -51,10 +51,19 @@ public class NutProcParserTest {
         assertThatThrownBy(() -> new NutProcParser(controller)).isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    public void requiredBooleansDefaultToFalse() throws InvocationTargetException, IllegalAccessException {
+        final var controller = new Controller();
+        final var parser = new NutProcParser(controller);
+        final var invocation = parser.parse("bool");
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("false false null");
+    }
+
     static class Controller {
         String string;
 
-        @NutMethod()
+        @NutMethod
         void test() {
             this.string = "done";
         }
@@ -65,8 +74,13 @@ public class NutProcParserTest {
         }
 
         @NutMethod("test-params")
-        void voidTestParams(@NutParam("n") int n, @NutParam("s") String s, @NutParam("b") boolean b) {
+        void testParams(@NutParam("n") int n, @NutParam("s") String s, @NutParam("b") boolean b) {
             this.string = "%d %s %b".formatted(n, s, b);
+        }
+
+        @NutMethod
+        void bool(@NutParam("a") boolean a, @NutParam("b") boolean b, @NutParam("c") Boolean c) {
+            this.string = "%b %b %s".formatted(a, b, c != null ? c.toString() : "null");
         }
     }
 
