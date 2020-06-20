@@ -55,9 +55,33 @@ public class NutProcParserTest {
     public void requiredBooleansDefaultToFalse() throws InvocationTargetException, IllegalAccessException {
         final var controller = new Controller();
         final var parser = new NutProcParser(controller);
-        final var invocation = parser.parse("bool");
+        final var invocation = parser.parse("require-booleans");
         invocation.invoke(controller);
-        assertThat(controller.string).isEqualTo("false false null");
+        assertThat(controller.string).isEqualTo("false false false");
+    }
+
+    @Test
+    public void optionalBooleansDefaultToNull() throws InvocationTargetException, IllegalAccessException {
+        final var controller = new Controller();
+        final var parser = new NutProcParser(controller);
+        final var invocation = parser.parse("opt-booleans");
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("false null null");
+    }
+
+    @Test
+    public void parseBooleans() throws InvocationTargetException, IllegalAccessException {
+        final var controller = new Controller();
+        final var parser = new NutProcParser(controller);
+        var invocation = parser.parse("opt-booleans true false true");
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("true false true");
+        invocation = parser.parse("opt-booleans -b -a=false");
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("false true null");
+        invocation = parser.parse("opt-booleans -c");
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("false null true");
     }
 
     static class Controller {
@@ -74,13 +98,27 @@ public class NutProcParserTest {
         }
 
         @NutMethod("test-params")
-        void testParams(@NutParam("n") int n, @NutParam("s") String s, @NutParam("b") boolean b) {
+        void testParams(@NutParam("n") int n,
+                        @NutParam("s") String s,
+                        @NutParam("b") boolean b) {
             this.string = "%d %s %b".formatted(n, s, b);
         }
 
-        @NutMethod
-        void bool(@NutParam("a") boolean a, @NutParam("b") boolean b, @NutParam("c") Boolean c) {
-            this.string = "%b %b %s".formatted(a, b, c != null ? c.toString() : "null");
+        @NutMethod("require-booleans")
+        void requireBooleans(@NutParam("a") boolean a,
+                  @NutParam("b") boolean b,
+                  @NutParam(value = "c", isRequired = true) Boolean c) {
+            this.string = "%b %b %b".formatted(a, b, c);
+        }
+
+        @NutMethod("opt-booleans")
+        void optBooleans(@NutParam("a") boolean a,
+                        @NutParam("b") Boolean b,
+                        @NutParam("c") Boolean c) {
+            this.string = "%b %s %s".formatted(
+                    a,
+                    b != null ? b.toString() : "null",
+                    c != null ? c.toString() : "null");
         }
     }
 
