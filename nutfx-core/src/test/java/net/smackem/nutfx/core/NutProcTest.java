@@ -93,12 +93,12 @@ public class NutProcTest {
     }
 
     @Test
-    public void throwsOnNonUniqueParameterName() {
-        final var method = NutTests.getMethodByName(this, "methodWithNonUniqueParameterNames");
+    public void throwsOnAmbiguousParameterName() {
+        final var method = NutTests.getMethodByName(this, "methodWithAmbiguousParameterNames");
         assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @NutMethod
-    void methodWithNonUniqueParameterNames(@NutParam("x") int x, @NutParam("x") int y) {
+    void methodWithAmbiguousParameterNames(@NutParam("x") int x, @NutParam("x") int y) {
     }
 }

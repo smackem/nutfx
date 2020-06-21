@@ -5,5 +5,6 @@ public enum ParameterType {
     INTEGER,
     BOOLEAN,
     DOUBLE,
+    ENUM,
     CUSTOM;
 }

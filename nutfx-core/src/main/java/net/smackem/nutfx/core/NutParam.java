@@ -7,4 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface NutParam {
     String value();
     boolean isRequired() default false;
+    Class<?> converterClass() default Void.class;
 }
