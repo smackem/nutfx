@@ -1,8 +1,10 @@
 package net.smackem.nutfx.core;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class NutProc {
@@ -66,6 +68,9 @@ class NutProc {
         }
         final Class<?> type = parameter.getType();
         final boolean optional = type.isPrimitive() == false && nutParam.isRequired() == false;
+        if (nutParam.converterClass() != void.class) {
+            return NutProcParameter.custom(nutParam.value(), getConverter(nutParam.converterClass(), type), optional);
+        }
         if (type == int.class || type == Integer.class) {
             return NutProcParameter.integer(nutParam.value(), optional);
         }
@@ -79,5 +84,33 @@ class NutProc {
             return NutProcParameter.string(nutParam.value(), optional);
         }
         throw new IllegalArgumentException("parameter '" + parameter.getName() + "' is of unsupported type");
+    }
+
+    private static Function<String, Object> getConverter(Class<?> converterClass, Class<?> paramType) throws IllegalArgumentException {
+        final Method method;
+        try {
+            method = findConverterMethod(converterClass);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        }
+        if (method.getReturnType() != paramType) {
+            throw new IllegalArgumentException("the method '%s' does not return %s".formatted(method, paramType));
+        }
+        return o -> invokeConvertMethod(method, o);
+    }
+
+    private static Object invokeConvertMethod(Method method, Object arg) {
+        try {
+            return method.invoke(arg);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Method findConverterMethod(Class<?> converterClass) throws NoSuchMethodException {
+        return Arrays.stream(converterClass.getDeclaredMethods())
+                .filter(m -> m.getDeclaredAnnotation(NutConvert.class) != null)
+                .findFirst()
+                .orElse(converterClass.getDeclaredMethod("parse", String.class));
     }
 }
