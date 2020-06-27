@@ -2,6 +2,7 @@ package net.smackem.nutfx.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.function.Function;
@@ -96,12 +97,15 @@ class NutProc {
         if (method.getReturnType() != paramType) {
             throw new IllegalArgumentException("the method '%s' does not return %s".formatted(method, paramType));
         }
+        if ((method.getModifiers() & Modifier.STATIC) == 0) {
+            throw new IllegalArgumentException("the method '%s' is not static".formatted(method));
+        }
         return o -> invokeConvertMethod(method, o);
     }
 
     private static Object invokeConvertMethod(Method method, Object arg) {
         try {
-            return method.invoke(arg);
+            return method.invoke(null, arg);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
