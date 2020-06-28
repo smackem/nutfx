@@ -2,6 +2,8 @@ package net.smackem.nutfx.core;
 
 import org.junit.Test;
 
+import java.util.Objects;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -100,5 +102,54 @@ public class NutProcTest {
 
     @NutMethod
     void methodWithAmbiguousParameterNames(@NutParam("x") int x, @NutParam("x") int y) {
+    }
+
+    @Test
+    public void throwsOnUnsupportedParameterType() {
+        final var method = NutTests.getMethodByName(this, "methodWithUnsupportedParameterType");
+        assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @NutMethod
+    void methodWithUnsupportedParameterType(@NutParam("x") int x, @NutParam("x") Void y) {
+    }
+
+    @Test
+    public void customConverter() {
+        final var method = NutTests.getMethodByName(this, "methodWithCustomParameter");
+        final var proc = NutProc.fromMethod(method);
+        assertThat(proc.parameters()).extracting(NutProcParameter::converter)
+                .noneMatch(Objects::isNull);
+        assertThat(proc.parameters().iterator().next().converter().apply("100")).isEqualTo(100);
+    }
+
+    @Test
+    public void customConverterWithAnnotation() {
+        final var method = NutTests.getMethodByName(this, "methodWithCustomParameterAnnotation");
+        final var proc = NutProc.fromMethod(method);
+        assertThat(proc.parameters()).extracting(NutProcParameter::converter)
+                .noneMatch(Objects::isNull);
+        assertThat(proc.parameters().iterator().next().converter().apply("100")).isEqualTo(100);
+    }
+
+    @NutMethod
+    void methodWithCustomParameter(@NutParam(value = "x", converterClass = IntegerConverter.class) int x) {
+    }
+
+    @NutMethod
+    void methodWithCustomParameterAnnotation(@NutParam(value = "x", converterClass = IntegerConverterWithAnnotation.class) int x) {
+    }
+
+    private static class IntegerConverter {
+        public static int parse(String s) {
+            return Integer.parseInt(s);
+        }
+    }
+
+    private static class IntegerConverterWithAnnotation {
+        @NutConvert
+        int parseInt(String s) {
+            return Integer.parseInt(s);
+        }
     }
 }

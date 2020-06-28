@@ -113,7 +113,7 @@ class NutProc {
 
     private static Method findConverterMethod(Class<?> converterClass) throws NoSuchMethodException {
         return Arrays.stream(converterClass.getDeclaredMethods())
-                .filter(m -> m.getDeclaredAnnotation(NutConvert.class) != null)
+                .filter(m -> m.isAnnotationPresent(NutConvert.class))
                 .findFirst()
                 .orElse(converterClass.getDeclaredMethod("parse", String.class));
     }
