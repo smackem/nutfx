@@ -90,15 +90,9 @@ class NutProc {
     private static Function<String, Object> getConverter(Class<?> converterClass, Class<?> paramType) throws IllegalArgumentException {
         final Method method;
         try {
-            method = findConverterMethod(converterClass);
+            method = findConverterMethod(converterClass, paramType);
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(e);
-        }
-        if (method.getReturnType() != paramType) {
-            throw new IllegalArgumentException("the method '%s' does not return %s".formatted(method, paramType));
-        }
-        if ((method.getModifiers() & Modifier.STATIC) == 0) {
-            throw new IllegalArgumentException("the method '%s' is not static".formatted(method));
         }
         return o -> invokeConvertMethod(method, o);
     }
@@ -111,10 +105,14 @@ class NutProc {
         }
     }
 
-    private static Method findConverterMethod(Class<?> converterClass) throws NoSuchMethodException {
-        return Arrays.stream(converterClass.getDeclaredMethods())
-                .filter(m -> m.isAnnotationPresent(NutConvert.class))
-                .findFirst()
-                .orElse(converterClass.getDeclaredMethod("parse", String.class));
+    private static Method findConverterMethod(Class<?> converterClass, Class<?> returnType) throws NoSuchMethodException {
+        final Method method = converterClass.getDeclaredMethod("parse", String.class);
+        if (method.getReturnType() != returnType) {
+            throw new NoSuchMethodException("the method '%s' does not return %s".formatted(method, returnType));
+        }
+        if ((method.getModifiers() & Modifier.STATIC) == 0) {
+            throw new NoSuchMethodException("the method '%s' is not static".formatted(method));
+        }
+        return method;
     }
 }

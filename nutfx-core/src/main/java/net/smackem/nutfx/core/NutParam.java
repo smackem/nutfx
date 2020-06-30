@@ -2,6 +2,7 @@ package net.smackem.nutfx.core;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.function.Function;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NutParam {
@@ -11,12 +12,6 @@ public @interface NutParam {
     /**
      * A class that is searched for the following methods, in order:
      * <ul>
-     *     <li>
-     *         <code>
-     *     &at;NutConvert
-     *     static type-of-parameter method-name(String)
-     *         </code>
-     *     </li>
      *     <li>
      *         <code>
      *     static type-of-parameter parse(String)

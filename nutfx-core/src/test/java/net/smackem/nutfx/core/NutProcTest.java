@@ -74,12 +74,11 @@ public class NutProcTest {
     }
 
     @NutMethod
-    void methodWithOptionalParameters(
-            @NutParam("n") Integer n,
-            @NutParam("b") Boolean b,
-            @NutParam("d") Double d,
-            @NutParam("s") String s,
-            @NutParam(value = "required", isRequired = true) String required) {
+    void methodWithOptionalParameters(@NutParam("n") Integer n,
+                                      @NutParam("b") Boolean b,
+                                      @NutParam("d") Double d,
+                                      @NutParam("s") String s,
+                                      @NutParam(value = "required", isRequired = true) String required) {
     }
 
     @Test
@@ -124,12 +123,9 @@ public class NutProcTest {
     }
 
     @Test
-    public void customConverterWithAnnotation() {
+    public void throwsOnConverterWithoutParseMethod() {
         final var method = NutTests.getMethodByName(this, "methodWithCustomParameterAnnotation");
-        final var proc = NutProc.fromMethod(method);
-        assertThat(proc.parameters()).extracting(NutProcParameter::converter)
-                .noneMatch(Objects::isNull);
-        assertThat(proc.parameters().iterator().next().converter().apply("100")).isEqualTo(100);
+        assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @NutMethod
@@ -137,18 +133,17 @@ public class NutProcTest {
     }
 
     @NutMethod
-    void methodWithCustomParameterAnnotation(@NutParam(value = "x", converterClass = IntegerConverterWithAnnotation.class) int x) {
+    void methodWithCustomParameterAnnotation(@NutParam(value = "x", converterClass = IntegerConverterWithoutParseMethod.class) int x) {
     }
 
     private static class IntegerConverter {
-        public static int parse(String s) {
+        static int parse(String s) {
             return Integer.parseInt(s);
         }
     }
 
-    private static class IntegerConverterWithAnnotation {
-        @NutConvert
-        int parseInt(String s) {
+    private static class IntegerConverterWithoutParseMethod {
+        static int parseInt(String s) {
             return Integer.parseInt(s);
         }
     }
