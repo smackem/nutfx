@@ -60,12 +60,12 @@ public class NutEmittingVisitor extends NutBaseVisitor<Void> {
 
     private Object parseValue(NutParser.ValueContext ctx, NutProcParameter<?> parameter) {
         return switch (parameter.type()) {
-            case STRING -> ctx.getText().replaceAll("^[\"']|[\"']$", "");
+            case STRING -> trimStringDelimiters(ctx.getText());
             case INTEGER -> Integer.parseInt(ctx.Integer().getText());
             case DOUBLE -> Double.parseDouble(ctx.Float().getText());
             case BOOLEAN -> ctx == null || ctx.getText().isBlank() || Boolean.parseBoolean(ctx.getText());
             case ENUM -> null;
-            case CUSTOM -> parameter.converter().apply(ctx.getText());
+            case CUSTOM -> parameter.converter().apply(trimStringDelimiters(ctx.getText()));
         };
     }
 
@@ -74,5 +74,9 @@ public class NutEmittingVisitor extends NutBaseVisitor<Void> {
                 ctx.getStart().getLine(),
                 ctx.getStart().getCharPositionInLine(),
                 message));
+    }
+
+    private static String trimStringDelimiters(String s) {
+        return s.replaceAll("^[\"']|[\"']$", "");
     }
 }

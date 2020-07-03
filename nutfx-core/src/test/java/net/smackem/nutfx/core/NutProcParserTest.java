@@ -84,7 +84,17 @@ public class NutProcParserTest {
         assertThat(controller.string).isEqualTo("false null true");
     }
 
-    static class Controller {
+
+    @Test
+    public void testCustomConverter() throws InvocationTargetException, IllegalAccessException {
+        final var controller = new Controller();
+        final var parser = new NutProcParser(controller);
+        var invocation = parser.parse("get-pointmag -point='100;150'");
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("250");
+    }
+
+    private static class Controller {
         String string;
 
         @NutMethod
@@ -106,27 +116,39 @@ public class NutProcParserTest {
 
         @NutMethod("require-booleans")
         void requireBooleans(@NutParam("a") boolean a,
-                  @NutParam("b") boolean b,
-                  @NutParam(value = "c", isRequired = true) Boolean c) {
+                             @NutParam("b") boolean b,
+                             @NutParam(value = "c", isRequired = true) Boolean c) {
             this.string = "%b %b %b".formatted(a, b, c);
         }
 
         @NutMethod("opt-booleans")
         void optBooleans(@NutParam("a") boolean a,
-                        @NutParam("b") Boolean b,
-                        @NutParam("c") Boolean c) {
+                         @NutParam("b") Boolean b,
+                         @NutParam("c") Boolean c) {
             this.string = "%b %s %s".formatted(
                     a,
                     b != null ? b.toString() : "null",
                     c != null ? c.toString() : "null");
         }
+
+        @NutMethod("get-pointmag")
+        void getPointMagnitude(@NutParam("point") Point p) {
+            this.string = String.valueOf(p.x() + p.y());
+        }
     }
 
-    static class ControllerWithDuplicates {
+    private static class ControllerWithDuplicates {
         @NutMethod()
         void a() { }
 
         @NutMethod("a")
         void b() { }
+    }
+
+    private record Point(int x, int y) {
+        static Point parse(String s) {
+            final String[] tokens = s.split(";");
+            return new Point(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
+        }
     }
 }

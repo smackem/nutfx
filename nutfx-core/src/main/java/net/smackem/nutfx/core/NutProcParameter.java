@@ -53,7 +53,7 @@ class NutProcParameter<T> {
         return new NutProcParameter<>(name, ParameterType.BOOLEAN, optional, null, null);
     }
 
-    public static NutProcParameter<Double> floatingPoint(String name, boolean optional) {
+    public static NutProcParameter<Double> float64(String name, boolean optional) {
         return new NutProcParameter<>(name, ParameterType.DOUBLE, optional, null, null);
     }
 

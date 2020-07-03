@@ -79,12 +79,29 @@ class NutProc {
             return NutProcParameter.bool(nutParam.value(), optional);
         }
         if (type == double.class || type == Double.class) {
-            return NutProcParameter.floatingPoint(nutParam.value(), optional);
+            return NutProcParameter.float64(nutParam.value(), optional);
         }
         if (type == String.class) {
             return NutProcParameter.string(nutParam.value(), optional);
         }
-        throw new IllegalArgumentException("parameter '" + parameter.getName() + "' is of unsupported type");
+        if (type.isEnum()) {
+            return convertEnumParameter(parameter, nutParam, optional);
+        }
+        return convertCustomParameter(parameter, nutParam, optional);
+    }
+
+    private static NutProcParameter<?> convertEnumParameter(Parameter parameter, NutParam nutParam, boolean optional) {
+        return null;
+    }
+
+    private static NutProcParameter<?> convertCustomParameter(Parameter parameter, NutParam nutParam, boolean optional) {
+        final Function<String, ?> converter;
+        try {
+            converter = getConverter(parameter.getType(), parameter.getType());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("parameter '" + parameter.getName() + "' is of unsupported type");
+        }
+        return NutProcParameter.custom(nutParam.value(), converter, optional);
     }
 
     private static Function<String, Object> getConverter(Class<?> converterClass, Class<?> paramType) throws IllegalArgumentException {

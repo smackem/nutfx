@@ -55,10 +55,9 @@ public class NutInvocationTest {
         }
 
         @NutMethod
-        void methodWithOptionalParams(
-                @NutParam("s") String s,
-                @NutParam("n") Integer n,
-                @NutParam("b") Boolean b) {
+        void methodWithOptionalParams(@NutParam("s") String s,
+                                      @NutParam("n") Integer n,
+                                      @NutParam("b") Boolean b) {
             System.out.printf("%s %d %b", s, n, b);
             this.someValue = n != null ? n : 0;
         }
