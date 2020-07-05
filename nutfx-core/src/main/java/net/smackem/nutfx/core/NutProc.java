@@ -9,6 +9,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class NutProc {
+    private static final Class<?>[] CONVERTER_METHOD_PARAMETER_TYPES = { String.class };
+
     private final String name;
     private final List<NutProcParameter<?>> parameters;
     private final Method method;
@@ -91,7 +93,7 @@ class NutProc {
     }
 
     private static NutProcParameter<?> convertEnumParameter(Parameter parameter, NutParam nutParam, boolean optional) {
-        return null;
+        return NutProcParameter.enumeration(nutParam.value(), parameter.getType(), optional);
     }
 
     private static NutProcParameter<?> convertCustomParameter(Parameter parameter, NutParam nutParam, boolean optional) {
@@ -123,13 +125,18 @@ class NutProc {
     }
 
     private static Method findConverterMethod(Class<?> converterClass, Class<?> returnType) throws NoSuchMethodException {
-        final Method method = converterClass.getDeclaredMethod("parse", String.class);
-        if (method.getReturnType() != returnType) {
-            throw new NoSuchMethodException("the method '%s' does not return %s".formatted(method, returnType));
+        final String[] methodNames = {"parse", "valueOf"};
+        for (final String methodName : methodNames) {
+            final var method = Arrays.stream(converterClass.getDeclaredMethods())
+                    .filter(m -> m.getName().equals(methodName))
+                    .filter(m -> (m.getModifiers() & Modifier.STATIC) != 0)
+                    .filter(m -> m.getReturnType() == returnType)
+                    .filter(m -> Arrays.equals(m.getParameterTypes(), CONVERTER_METHOD_PARAMETER_TYPES))
+                    .findFirst();
+            if (method.isPresent()) {
+                return method.get();
+            }
         }
-        if ((method.getModifiers() & Modifier.STATIC) == 0) {
-            throw new NoSuchMethodException("the method '%s' is not static".formatted(method));
-        }
-        return method;
+        throw new NoSuchMethodException("not matching converter method found. must be 'public static PARAM_TYPE parse|valueOf (String)");
     }
 }

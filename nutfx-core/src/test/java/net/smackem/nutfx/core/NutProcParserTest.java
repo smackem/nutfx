@@ -94,6 +94,15 @@ public class NutProcParserTest {
         assertThat(controller.string).isEqualTo("250");
     }
 
+    @Test
+    public void testEnum() throws InvocationTargetException, IllegalAccessException {
+        final var controller = new Controller();
+        final var parser = new NutProcParser(controller);
+        var invocation = parser.parse("get-html BODY");
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("BODY");
+    }
+
     private static class Controller {
         String string;
 
@@ -135,6 +144,11 @@ public class NutProcParserTest {
         void getPointMagnitude(@NutParam("point") Point p) {
             this.string = String.valueOf(p.x() + p.y());
         }
+
+        @NutMethod("get-html")
+        void getHtml(@NutParam(value = "html", isRequired = true) HtmlTag html) {
+            this.string = html.toString();
+        }
     }
 
     private static class ControllerWithDuplicates {
@@ -150,5 +164,13 @@ public class NutProcParserTest {
             final String[] tokens = s.split(";");
             return new Point(Integer.parseInt(tokens[0]), Integer.parseInt(tokens[1]));
         }
+    }
+
+    private enum HtmlTag {
+        A,
+        DIV,
+        HEAD,
+        BODY,
+        HTML,
     }
 }

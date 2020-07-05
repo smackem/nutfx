@@ -1,5 +1,7 @@
 package net.smackem.nutfx.core;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -57,16 +59,36 @@ class NutProcParameter<T> {
         return new NutProcParameter<>(name, ParameterType.DOUBLE, optional, null, null);
     }
 
-    public static <T extends Enum<?>> NutProcParameter<T> enumeration(String name, Class<T> enumClass, boolean optional) {
+    public static <T> NutProcParameter<T> enumeration(String name, Class<T> enumClass, boolean optional) {
         if (enumClass.isEnum() == false) {
             throw new IllegalArgumentException("specified class '" + enumClass + "' is not an enum");
         }
-        return new NutProcParameter<>(name, ParameterType.ENUM, optional, null, List.of(enumClass.getEnumConstants()));
+        final Method convertMethod;
+        try {
+            convertMethod = enumClass.getDeclaredMethod("valueOf", String.class);
+        } catch (NoSuchMethodException impossible) {
+            throw new RuntimeException("enum without valueOf");
+        }
+        return new NutProcParameter<>(
+                name,
+                ParameterType.ENUM,
+                optional,
+                s -> invokeConvertMethod(convertMethod, s),
+                List.of(enumClass.getEnumConstants()));
     }
 
     public static <T> NutProcParameter<T> custom(String name, Function<String, T> converter, boolean optional) {
         Objects.requireNonNull(converter);
         return new NutProcParameter<>(name, ParameterType.CUSTOM, optional, converter, null);
+    }
+
+    private static <T> T invokeConvertMethod(Method method, String arg) {
+        try {
+            //noinspection unchecked
+            return (T) method.invoke(null, arg);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

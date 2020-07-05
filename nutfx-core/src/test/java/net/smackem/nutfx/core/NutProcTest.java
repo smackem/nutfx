@@ -2,6 +2,7 @@ package net.smackem.nutfx.core;
 
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -122,18 +123,8 @@ public class NutProcTest {
         assertThat(proc.parameters().iterator().next().converter().apply("100")).isEqualTo(100);
     }
 
-    @Test
-    public void throwsOnConverterWithoutParseMethod() {
-        final var method = NutTests.getMethodByName(this, "methodWithCustomParameterAnnotation");
-        assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
-    }
-
     @NutMethod
     void methodWithCustomParameter(@NutParam(value = "x", converterClass = IntegerConverter.class) int x) {
-    }
-
-    @NutMethod
-    void methodWithCustomParameterAnnotation(@NutParam(value = "x", converterClass = IntegerConverterWithoutParseMethod.class) int x) {
     }
 
     private static class IntegerConverter {
@@ -142,9 +133,40 @@ public class NutProcTest {
         }
     }
 
+    @Test
+    public void throwsOnConverterWithoutParseMethod() {
+        final var method = NutTests.getMethodByName(this, "methodWithCustomParameterAnnotation");
+        assertThatThrownBy(() -> NutProc.fromMethod(method)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @NutMethod
+    void methodWithCustomParameterAnnotation(@NutParam(value = "x", converterClass = IntegerConverterWithoutParseMethod.class) int x) {
+    }
+
     private static class IntegerConverterWithoutParseMethod {
         static int parseInt(String s) {
             return Integer.parseInt(s);
         }
+    }
+
+    @Test
+    public void convertEnum() {
+        final var method = NutTests.getMethodByName(this, "methodWithEnumParameter");
+        final var proc = NutProc.fromMethod(method);
+        assertThat(proc.parameters()).extracting(NutProcParameter::converter)
+                .noneMatch(Objects::isNull);
+        final var firstParameter = proc.parameters().iterator().next();
+        assertThat(firstParameter.possibleValues()).isEqualTo(List.of(Choice.CHOICE_A, Choice.CHOICE_B));
+        assertThat(firstParameter.converter().apply("CHOICE_A")).isEqualTo(Choice.CHOICE_A);
+        assertThat(firstParameter.converter().apply("CHOICE_B")).isEqualTo(Choice.CHOICE_B);
+    }
+
+    @NutMethod
+    void methodWithEnumParameter(@NutParam("choice") Choice choice) {
+    }
+
+    private enum Choice {
+        CHOICE_A,
+        CHOICE_B,
     }
 }
