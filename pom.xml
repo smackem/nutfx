@@ -15,6 +15,7 @@
 
     <modules>
         <module>nutfx-core</module>
+        <module>nutfx-controls</module>
     </modules>
 
     <dependencyManagement>

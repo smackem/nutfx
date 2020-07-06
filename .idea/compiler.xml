@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="nutfx-core" />
+        <module name="nutfx-controls" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="nutfx" target="14" />
+      <module name="nutfx-controls" target="14" />
       <module name="nutfx-core" target="14" />
     </bytecodeTargetLevel>
   </component>

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/nutfx.iml" filepath="$PROJECT_DIR$/nutfx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nutfx-controls/nutfx-controls.iml" filepath="$PROJECT_DIR$/nutfx-controls/nutfx-controls.iml" />
       <module fileurl="file://$PROJECT_DIR$/nutfx-core/nutfx-core.iml" filepath="$PROJECT_DIR$/nutfx-core/nutfx-core.iml" />
     </modules>
   </component>
