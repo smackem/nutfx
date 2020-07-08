@@ -17,6 +17,11 @@ public @interface NutParam {
      *     static type-of-parameter parse(String)
      *         </code>
      *     </li>
+     *     <li>
+     *         <code>
+     *     static type-of-parameter valueOf(String)
+     *         </code>
+     *     </li>
      * </ul>
      * @return A class object
      */

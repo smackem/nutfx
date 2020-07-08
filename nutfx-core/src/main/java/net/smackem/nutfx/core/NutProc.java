@@ -113,6 +113,7 @@ class NutProc {
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(e);
         }
+        method.setAccessible(true);
         return o -> invokeConvertMethod(method, o);
     }
 
