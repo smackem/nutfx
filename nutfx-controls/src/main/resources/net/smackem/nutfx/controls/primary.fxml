@@ -7,6 +7,8 @@
 
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ComboBox?>
+<?import net.smackem.nutfx.controls.AutoCompleteTextField?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="net.smackem.nutfx.controls.PrimaryController">
    <padding>
@@ -19,6 +21,14 @@
       </VBox>
    </center>
    <bottom>
-      <TextField fx:id="nutInput" onAction="#handleNutInput"/>
+      <VBox>
+         <AutoCompleteTextField fx:id="nutInputText"
+                                onAction="#handleNutInput"
+                                style="-fx-font-family: 'Cascadia Code', monospace"/>
+         <ComboBox fx:id="nutInput"
+                   onAction="#handleNutInput"
+                   editable="true"
+                   style="-fx-font-family: 'Cascadia Code, monospace'" />
+      </VBox>
    </bottom>
 </BorderPane>

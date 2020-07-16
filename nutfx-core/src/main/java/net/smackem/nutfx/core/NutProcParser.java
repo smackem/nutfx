@@ -16,9 +16,13 @@ public class NutProcParser {
     public NutProcParser(Object controller) {
         Objects.requireNonNull(controller);
         this.procMap = Arrays.stream(controller.getClass().getDeclaredMethods())
-                .filter(m -> m.getDeclaredAnnotation(NutMethod.class) != null)
+                .filter(m -> m.isAnnotationPresent(NutMethod.class))
                 .map(NutProc::fromMethod)
                 .collect(Collectors.toUnmodifiableMap(NutProc::name, proc -> proc));
+    }
+
+    public Map<String, NutProc> nutProcs() {
+        return this.procMap;
     }
 
     public NutInvocation parse(String source) {

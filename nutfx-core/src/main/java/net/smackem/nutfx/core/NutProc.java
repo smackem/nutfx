@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-class NutProc {
+public final class NutProc {
     private static final Class<?>[] CONVERTER_METHOD_PARAMETER_TYPES = { String.class };
 
     private final String name;
@@ -21,7 +21,7 @@ class NutProc {
         this.method = method;
     }
 
-    public static NutProc fromMethod(Method method) {
+    static NutProc fromMethod(Method method) {
         if (method.getReturnType() != void.class) {
             throw new IllegalArgumentException("controller method '" + method.getName() + "' does not return void");
         }
@@ -139,5 +139,18 @@ class NutProc {
             }
         }
         throw new NoSuchMethodException("not matching converter method found. must be 'public static PARAM_TYPE parse|valueOf (String)");
+    }
+
+    @Override
+    public String toString() {
+        final var sb = new StringBuilder();
+        sb.append(this.name);
+        if (this.parameters.isEmpty() == false) {
+            sb.append(" ");
+            sb.append(this.parameters.stream()
+                    .map(p -> "-%s=%s".formatted(p.name(), p.type()))
+                    .collect(Collectors.joining(" ")));
+        }
+        return sb.toString();
     }
 }

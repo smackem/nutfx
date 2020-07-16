@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-class NutProcParameter<T> {
+public final class NutProcParameter<T> {
     private final String name;
     private final ParameterType type;
     private final boolean optional;
@@ -43,23 +43,23 @@ class NutProcParameter<T> {
         return this.possibleValues;
     }
 
-    public static NutProcParameter<String> string(String name, boolean optional) {
+    static NutProcParameter<String> string(String name, boolean optional) {
         return new NutProcParameter<>(name, ParameterType.STRING, optional, null, null);
     }
 
-    public static NutProcParameter<Integer> integer(String name, boolean optional) {
+    static NutProcParameter<Integer> integer(String name, boolean optional) {
         return new NutProcParameter<>(name, ParameterType.INTEGER, optional, null, null);
     }
 
-    public static NutProcParameter<Boolean> bool(String name, boolean optional) {
+    static NutProcParameter<Boolean> bool(String name, boolean optional) {
         return new NutProcParameter<>(name, ParameterType.BOOLEAN, optional, null, null);
     }
 
-    public static NutProcParameter<Double> float64(String name, boolean optional) {
+    static NutProcParameter<Double> float64(String name, boolean optional) {
         return new NutProcParameter<>(name, ParameterType.DOUBLE, optional, null, null);
     }
 
-    public static <T> NutProcParameter<T> enumeration(String name, Class<T> enumClass, boolean optional) {
+    static <T> NutProcParameter<T> enumeration(String name, Class<T> enumClass, boolean optional) {
         if (enumClass.isEnum() == false) {
             throw new IllegalArgumentException("specified class '" + enumClass + "' is not an enum");
         }
@@ -77,7 +77,7 @@ class NutProcParameter<T> {
                 List.of(enumClass.getEnumConstants()));
     }
 
-    public static <T> NutProcParameter<T> custom(String name, Function<String, T> converter, boolean optional) {
+    static <T> NutProcParameter<T> custom(String name, Function<String, T> converter, boolean optional) {
         Objects.requireNonNull(converter);
         return new NutProcParameter<>(name, ParameterType.CUSTOM, optional, converter, null);
     }
