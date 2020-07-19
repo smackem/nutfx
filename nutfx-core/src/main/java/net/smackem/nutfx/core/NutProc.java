@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public final class NutProc {
+public final class NutProc implements Comparable<NutProc> {
     private static final Class<?>[] CONVERTER_METHOD_PARAMETER_TYPES = { String.class };
 
     private final String name;
@@ -152,5 +152,10 @@ public final class NutProc {
                     .collect(Collectors.joining(" ")));
         }
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(NutProc o) {
+        return this.name.compareTo(o.name);
     }
 }
