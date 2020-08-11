@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class NutProcParserTest {
 
     @Test
-    public void takesNameFromAnnotation() throws InvocationTargetException, IllegalAccessException {
+    public void takesNameFromAnnotation() throws InvocationTargetException {
         final Controller controller = new Controller();
         final NutProcParser parser = new NutProcParser(controller);
         final String source = """
@@ -22,7 +22,7 @@ public class NutProcParserTest {
     }
 
     @Test
-    public void parseMethodWithoutParams() throws InvocationTargetException, IllegalAccessException {
+    public void parseMethodWithoutParams() throws InvocationTargetException {
         final Controller controller = new Controller();
         final NutProcParser parser = new NutProcParser(controller);
         final String source = """
@@ -34,7 +34,7 @@ public class NutProcParserTest {
     }
 
     @Test
-    public void parseMethodWithParams() throws InvocationTargetException, IllegalAccessException {
+    public void parseMethodWithParams() throws InvocationTargetException {
         final Controller controller = new Controller();
         final NutProcParser parser = new NutProcParser(controller);
         final String source = """
@@ -52,7 +52,7 @@ public class NutProcParserTest {
     }
 
     @Test
-    public void requiredBooleansDefaultToFalse() throws InvocationTargetException, IllegalAccessException {
+    public void requiredBooleansDefaultToFalse() throws InvocationTargetException {
         final var controller = new Controller();
         final var parser = new NutProcParser(controller);
         final var invocation = parser.parse("require-booleans");
@@ -61,7 +61,7 @@ public class NutProcParserTest {
     }
 
     @Test
-    public void optionalBooleansDefaultToNull() throws InvocationTargetException, IllegalAccessException {
+    public void optionalBooleansDefaultToNull() throws InvocationTargetException {
         final var controller = new Controller();
         final var parser = new NutProcParser(controller);
         final var invocation = parser.parse("opt-booleans");
@@ -70,7 +70,7 @@ public class NutProcParserTest {
     }
 
     @Test
-    public void parseBooleans() throws InvocationTargetException, IllegalAccessException {
+    public void parseBooleans() throws InvocationTargetException {
         final var controller = new Controller();
         final var parser = new NutProcParser(controller);
         var invocation = parser.parse("opt-booleans true false true");
@@ -86,7 +86,7 @@ public class NutProcParserTest {
 
 
     @Test
-    public void testCustomConverter() throws InvocationTargetException, IllegalAccessException {
+    public void testCustomConverter() throws InvocationTargetException {
         final var controller = new Controller();
         final var parser = new NutProcParser(controller);
         var invocation = parser.parse("get-pointmag -point='100;150'");
@@ -95,12 +95,24 @@ public class NutProcParserTest {
     }
 
     @Test
-    public void testEnum() throws InvocationTargetException, IllegalAccessException {
+    public void testEnum() throws InvocationTargetException {
         final var controller = new Controller();
         final var parser = new NutProcParser(controller);
         var invocation = parser.parse("get-html BODY");
         invocation.invoke(controller);
         assertThat(controller.string).isEqualTo("BODY");
+    }
+
+    @Test
+    public void createAlias() throws InvocationTargetException {
+        final var controller = new Controller();
+        final var parser = new NutProcParser(controller);
+        final var alias = parser.createAlias(parser.nutProcs().get("test-it"), "alias");
+        final var invocation = parser.parse("alias");
+        assertThat(invocation.proc()).isSameAs(alias);
+        invocation.invoke(controller);
+        assertThat(controller.string).isEqualTo("done");
+        assertThatThrownBy(() -> parser.createAlias(alias, "alias")).isInstanceOf(IllegalArgumentException.class);
     }
 
     private static class Controller {

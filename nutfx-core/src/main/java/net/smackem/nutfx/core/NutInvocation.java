@@ -21,7 +21,7 @@ public final class NutInvocation {
         return this.proc;
     }
 
-    public void invoke(Object controller) throws InvocationTargetException, IllegalAccessException {
+    public void invoke(Object controller) throws InvocationTargetException {
         Objects.requireNonNull(controller);
         final Object[] args = new Object[this.proc.parameters().size()];
         int index = 0;
@@ -34,7 +34,11 @@ public final class NutInvocation {
             }
             args[index++] = arg;
         }
-        this.proc.method().invoke(controller, args);
+        try {
+            this.proc.method().invoke(controller, args);
+        } catch (IllegalAccessException ignored) {
+            // must never happen since ctor calls setAccessible()
+        }
     }
 
     void put(String name, Object value) {

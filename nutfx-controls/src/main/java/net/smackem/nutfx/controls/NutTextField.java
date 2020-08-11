@@ -9,13 +9,16 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import net.smackem.nutfx.core.NutProc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
 
 /**
@@ -53,6 +56,7 @@ import java.util.regex.Pattern;
  * @author smackem
  */
 public class NutTextField extends TextField {
+    private static final Logger log = LoggerFactory.getLogger(NutTextField.class);
     private final ObjectProperty<NutProc> lastSelectedItem = new SimpleObjectProperty<>();
     private final SortedSet<NutProc> entries = new TreeSet<>();
     private final ObservableList<NutProc> filteredEntries = FXCollections.observableArrayList();
@@ -240,6 +244,7 @@ public class NutTextField extends TextField {
             final Text post = new Text(result.substring(occurrence + text.length()));
             final TextFlow entryFlow = new TextFlow(pre, in, post);
             final CustomMenuItem item = new CustomMenuItem(entryFlow, true);
+            item.setDisable(true);
             item.setOnAction(e -> {
                 this.lastSelectedItem.set(itemObject);
                 this.entriesPopup.hide();

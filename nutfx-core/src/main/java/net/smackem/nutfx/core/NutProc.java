@@ -37,6 +37,14 @@ public final class NutProc implements Comparable<NutProc> {
         return new NutProc(name, parameters, method);
     }
 
+    NutProc alias(String name) {
+        Objects.requireNonNull(name);
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("name must not be blank!");
+        }
+        return new NutProc(name, this.parameters, this.method);
+    }
+
     public String name() {
         return this.name;
     }

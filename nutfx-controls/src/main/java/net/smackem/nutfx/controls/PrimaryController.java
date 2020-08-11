@@ -32,7 +32,7 @@ public class PrimaryController {
     }
 
     @FXML
-    private void handleNutInput(ActionEvent actionEvent) throws InvocationTargetException, IllegalAccessException {
+    private void handleNutInput(ActionEvent actionEvent) throws InvocationTargetException {
         final var source = this.nutInputText.getText();
         if (source.isBlank()) {
             return;
@@ -40,6 +40,7 @@ public class PrimaryController {
         final var invocation = parser.parse(source);
         if (invocation != null) {
             invocation.invoke(this);
+            this.nutInputText.setText("");
         }
     }
 
